@@ -6,33 +6,33 @@ import Messages from '../Messages';
 import Container from '../ui/Container';
 
 // Initialize Pusher with your credentials
-const pusher = new Pusher('eff84010cad346d22491', {
-    cluster: 'ap3',
-    //@ts-ignore
-    encrypted: true,
-});
+// const pusher = new Pusher('eff84010cad346d22491', {
+//     cluster: 'ap3',
+//     //@ts-ignore
+//     encrypted: true,
+// });
 
 function ChatBox({ user }: { user: UserType }) {
     const [message, setMessage] = useState<string>('')
     const [messages, setMessages] = useState<null | MessageType[]>(null)
 
-    useEffect(() => {
-        // Subscribe to a channel
-        const channel = pusher.subscribe('my-channel')
-        console.log(channel);
+    // useEffect(() => {
+    //     // Subscribe to a channel
+    //     const channel = pusher.subscribe('my-channel')
+    //     console.log(channel);
 
-        // Bind to an event on the channel
-        channel.bind('my-event', (data: any) => {
-            if (data.userId !== user.id) {
-                setMessages(prev => [...(prev || []), data])
-            }
-        });
+    //     // Bind to an event on the channel
+    //     channel.bind('my-event', (data: any) => {
+    //         if (data.userId !== user.id) {
+    //             setMessages(prev => [...(prev || []), data])
+    //         }
+    //     });
 
-        // Clean up the subscription when the component unmounts
-        return () => {
-            pusher.unsubscribe('my-channel');
-        };
-    }, []);
+    //     // Clean up the subscription when the component unmounts
+    //     return () => {
+    //         pusher.unsubscribe('my-channel');
+    //     };
+    // }, []);
 
     const getIsOwnMessage = (userId: string) => userId === user.id
 
