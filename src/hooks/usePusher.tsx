@@ -1,15 +1,16 @@
-import PusherType from "pusher-js/types/src/core/pusher";
 import { useEffect, useState } from "react";
+
 import Pusher from 'pusher-js';
+import { UserType } from "../types";
 
-export default function usePusher() {
 
-    const [pusher, setPusher] = useState<null | PusherType>(null)
 
-console.log(pusher);
+export default function usePusher({ user }: { user: null | UserType }) {
+
+    const [pusher, setPusher] = useState<null | Pusher>(null)
 
     useEffect(() => {
-        if (!pusher) {
+        if (!pusher && user) {
             const pusherInstance = new Pusher('eff84010cad346d22491', {
                 cluster: 'ap3',
                 //@ts-ignore
@@ -18,24 +19,14 @@ console.log(pusher);
 
             setPusher(pusherInstance)
 
-            const channel = pusherInstance.subscribe('my-channel')
-
-            console.log(channel);
-            console.log('channel');
-
-            // Bind to an event on the channel
-            channel.bind('my-event', (data: any) => {
-                console.log('new messageeeeeeee');
-                
-            });
-
         }
 
-        // Clean up the subscription when the component unmounts
         return () => {
-            pusher?.unsubscribe?.('my-channel');
+            pusher?.disconnect()
         };
-    }, []);
+    }, [user]);
 
-    return null
+    return {
+        pusher
+    }
 }
