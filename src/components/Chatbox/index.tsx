@@ -1,26 +1,76 @@
 
+import Pusher from 'pusher-js';
+import { useEffect, useState } from 'react';
 import { MessageType, UserType } from '../../types';
 import Messages from '../Messages';
 import Container from '../ui/Container';
 
+function ChatBox({ user, message, messages, addToMessages, changeMessage, selectedChat }: { user: UserType, message: string, messages: null | MessageType[], addToMessages: (message: MessageType) => void, changeMessage: (message: string) => void, }) {
+    const [isLoading, setIsLoading] = useState(false)
+    // const { pusher } = usePusher({ user })
+    // useChannelSubscription({
+    //     pusher,
+    //     channelName: 'private_'+user._id,
+    //     events: {
+    //         'message': (data: MessageType) => {
+    //             console.log(data);
+    //             console.log('aaaaaaaaaaaaaaaaaaa');
 
-function ChatBox({ user, message, messages, addToMessages, changeMessage }: { user: UserType, message: string, messages: null | MessageType[], addToMessages: (message: MessageType) => void, changeMessage: (message: string) => void, }) {
+    //             if (data.userId !== user?._id) {
+    //                 addToMessages(data)
+    //             }
+    //         }
+    //     }
+    // })
 
-    const getIsOwnMessage = (userId: string) => userId === user.id
+    useEffect(() => {
+        if (!selectedChat) return
+        const pusher = new Pusher('eff84010cad346d22491', {
+            cluster: 'ap3',
+            //@ts-ignore
+            encrypted: true,
+        });
+        const channel = pusher?.subscribe(`chat`)
+
+        channel?.bind('message', (data) => {
+            console.log('ssssssssssssssssssssssssssssssssssss');
+            console.log(data);
+            console.log('ssssssssssssssssssssssssssssssssssss');
+            if (data.userId !== user?._id) {
+                addToMessages(data)
+            }
+        })
+
+
+        return () => {
+            pusher?.disconnect()
+            pusher?.unbind_all();
+            pusher?.unsubscribe(`chat`);
+        };
+
+
+    }, [selectedChat])
+
+    const getIsOwnMessage = (userId: string) => userId === user._id
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (isLoading || message.trim() === '') return
+
         // Post message to server
-        const messageObject: MessageType = { date: new Date().toString(), userId: user.id, message }
+        const messageObject: MessageType = { date: new Date().toString(), userId: user._id, message }
         try {
+            setIsLoading(true)
             addToMessages(messageObject)
+
             await fetch('http://localhost:8080/trigger', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    channel: 'room1',
+                    channel: `chat`,
                     event: 'message',
                     data: messageObject,
                 }),
@@ -28,7 +78,9 @@ function ChatBox({ user, message, messages, addToMessages, changeMessage }: { us
             changeMessage('')
         } catch (error) {
             console.log(error);
-
+        }
+        finally {
+            setIsLoading(false)
         }
     };
 

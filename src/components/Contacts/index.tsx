@@ -2,7 +2,7 @@ import { useState } from "react";
 import SyncSearch from "../SyncSearch";
 import SearchedUsers from "../SearchedUsers";
 
-export default function Contacts() {
+export default function Contacts({selectChat}) {
     const [users, setUsers] = useState(null)
     const [query, setQuery] = useState('')
 
@@ -22,7 +22,6 @@ export default function Contacts() {
                 throw new Error(data.statusText)
             }
             const response = await data.json()
-            console.log(response);
             setUsers(response.users)
         } catch (error) {
             console.log(error);
@@ -32,7 +31,7 @@ export default function Contacts() {
     return (
         <div className="rounded-xl h-full w-[400px] bg-white p-3 flex items-center justify-start flex-col">
             <SyncSearch value={query} onChange={query => setQuery(query)} onSearch={onSearch} className=' w-full p-4 rounded-xl border focus:outline-none' placeholder='Enter message' />
-            <SearchedUsers users={users}/>
+            <SearchedUsers users={users} onClickUser={selectChat}/>
         </div>
     )
 }

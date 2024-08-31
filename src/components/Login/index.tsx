@@ -1,7 +1,6 @@
-import { FormEvent, useState } from 'react'
-import { UserType } from '../../types'
-import { idGenerator } from '../../utils'
-import Container from '../ui/Container'
+import { FormEvent, useState } from 'react';
+import { UserType } from '../../types';
+import Container from '../ui/Container';
 
 export default function Login({ changeUser }: { changeUser: (user: UserType) => void }) {
 
@@ -29,6 +28,7 @@ export default function Login({ changeUser }: { changeUser: (user: UserType) => 
                 throw new Error(data.statusText)
             }
             const response = await data.json()
+            localStorage.setItem('user', JSON.stringify(response.user))
             changeUser(response.user)
             // setName('')
         } catch (error) {
