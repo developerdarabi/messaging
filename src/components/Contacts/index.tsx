@@ -2,7 +2,7 @@ import { useState } from "react";
 import SyncSearch from "../SyncSearch";
 import SearchedUsers from "../SearchedUsers";
 
-export default function Contacts({selectChat}) {
+export default function Contacts({selectChat}:any) {
     const [users, setUsers] = useState(null)
     const [query, setQuery] = useState('')
 
