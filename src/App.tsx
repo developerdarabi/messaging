@@ -1,10 +1,10 @@
 
-import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
-import Contacts from './components/Contacts';
 import ChatBox from './components/Chatbox';
+import Contacts from './components/Contacts';
 import Container from './components/ui/Container';
-import { MessageType, UserType } from './types';
+import { usePusher } from './provider/PusherProvider';
+import { MessageType } from './types';
 
 function App() {
   // const [user, setUser] = useState<null | UserType>(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || "") : null)
@@ -16,43 +16,31 @@ function App() {
   const changeMessage = (message: string) => setMessage(message)
   const selectChat = (chat: any) => setSelectedChat(chat)
 
+  const pusher = usePusher()
+
   const user = JSON.parse(localStorage.getItem('user') || "")
+
   console.log(user);
 
-
   useEffect(() => {
-    const pusher = new Pusher('eff84010cad346d22491', {
-      cluster: 'ap3',
-      //@ts-ignore
-      encrypted: true,
-      authEndpoint: 'http://localhost:8080/pusher/auth'
-    });
+    if (pusher) {
+      const channel = pusher.subscribe(`private-chat-${user._id}`)
+      channel?.bind('new-message', (data: any) => {
+        console.log('ssssssssssssssssssssssssssssssssssss');
+        console.log(data);
+        console.log('ssssssssssssssssssssssssssssssssssss');
+        //@ts-ignore
+        addToMessages(data)
+      })
 
-    //@ts-ignore
-    const channel = pusher?.subscribe(`private-user-${user._id}`)
-
-    channel?.bind('new-message', (data: any) => {
-      console.log('ssssssssssssssssssssssssssssssssssss');
-      console.log(data);
-      console.log('ssssssssssssssssssssssssssssssssssss');
-      //@ts-ignore
-      // if (data.userId !== user?._id) {
-      //   addToMessages(data)
-      // }
-    })
-
+    }
 
     return () => {
-      // console.log('dddddddddddddddddd');
-
-      // pusher?.disconnect()
-      // pusher?.unbind_all();
-      // //@ts-ignore
-      // pusher?.unsubscribe(`private-user-${user._id}`);
+      pusher?.unsubscribe(`private-user-${user._id}`);
     };
 
 
-  }, [])
+  }, [pusher])
 
   // if (!localStorage.getItem('user')) return <main className='bg-slate-300 h-screen p-2 flex items-center justify-center w-full'><Login changeUser={(user: any) => setUser(user)} /></main>
 
