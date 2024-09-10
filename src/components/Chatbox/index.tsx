@@ -1,29 +1,21 @@
 
 import { useState } from 'react';
+import { useAuth } from '../../provider/Auth';
+import { useMessage } from '../../provider/Message';
+import { useSelectedChat } from '../../provider/SelectedChat';
 import { MessageType } from '../../types';
 import Messages from '../Messages';
 import Container from '../ui/Container';
 
-function ChatBox({ user, message, messages, addToMessages, changeMessage, selectedChat }: any) {
+function ChatBox() {
+    const { chat: { messages, chat }, addToMessages } = useSelectedChat()
+    const { message, changeMessage } = useMessage()
+    const { user } = useAuth()
+
     const [isLoading, setIsLoading] = useState(false)
-    // const { pusher } = usePusher({ user })
-    // useChannelSubscription({
-    //     pusher,
-    //     channelName: 'private_'+user._id,
-    //     events: {
-    //         'message': (data: MessageType) => {
-    //             console.log(data);
-    //             console.log('aaaaaaaaaaaaaaaaaaa');
 
-    //             if (data.userId !== user?._id) {
-    //                 addToMessages(data)
-    //             }
-    //         }
-    //     }
-    // })
+    if (!chat || !user) return <Container className="h-full flex items-center justify-center bg-transparent"><h1 className='text-sm font-medium'>Start chating by select one </h1></Container>
 
-
-    const getIsOwnMessage = (userId: string) => userId === user._id
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -31,7 +23,7 @@ function ChatBox({ user, message, messages, addToMessages, changeMessage, select
         if (isLoading || message.trim() === '') return
 
         // Post message to server
-        const messageObject: MessageType = { date: new Date().toString(), userId: user._id, message }
+        const messageObject: MessageType = { date: new Date().toString(), userId: user._id, message,isUserMessage:true }
         try {
             setIsLoading(true)
             addToMessages(messageObject)
@@ -42,8 +34,9 @@ function ChatBox({ user, message, messages, addToMessages, changeMessage, select
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId: selectedChat._id,
+                    userId: chat._id,
                     message: messageObject.message,
+                    date:messageObject.date
                 }),
             });
             changeMessage('')
@@ -59,7 +52,7 @@ function ChatBox({ user, message, messages, addToMessages, changeMessage, select
         <Container component={'form'} onSubmit={handleSubmit}>
             <h1 className="text-2xl font-bold">Start chating</h1>
             <div className='h-[70vh] overflow-auto flex flex-col gap-4'>
-                <Messages messages={messages} getIsOwnMessage={getIsOwnMessage} />
+                <Messages messages={messages}/>
             </div>
             <input value={message} onChange={e => changeMessage(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Enter message' />
             <button type='submit' className='bg-indigo-400 rounded-xl w-full p-4 text-white'>Start</button>

@@ -1,0 +1,53 @@
+import Pusher from 'pusher-js';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useAuth } from './Auth';
+import { useSelectedChat } from './SelectedChat';
+
+const PusherContext = createContext();
+
+export const PusherProvider = ({ children }) => {
+    const [pusher, setPusher] = useState(null);
+
+    const { addToMessages, chat: { chat } } = useSelectedChat()
+
+    const { user } = useAuth()
+
+    const isMounted = useRef<boolean>(false)
+
+    var channel
+
+    useEffect(() => {
+        if (user) {
+            if (!isMounted.current) {
+                Pusher.logToConsole = true;
+                const pusherInstance = new Pusher('eff84010cad346d22491', {
+                    cluster: 'ap3',
+                    authEndpoint: 'http://localhost:8080/pusher/auth'
+                });
+                setPusher(pusherInstance);
+                channel = pusherInstance.subscribe(`private-chat-${user._id}`)
+                channel.bind('new-message', (message) => {
+                    console.log('sssssssssssssss');
+                    console.log(message);
+                    console.log('sssssssssssssss');
+                    chat && addToMessages({ ...message, isUserMessage: false })
+                })
+                isMounted.current = true
+            }
+        }
+        return () => {
+            // channel?.unbind('new-message')
+            pusher?.unsubscribe(`private-chat-${user._id}`)
+        }
+    }, [user,chat]);
+
+    return (
+        <PusherContext.Provider value={pusher}>
+            {children}
+        </PusherContext.Provider>
+    );
+};
+
+export const usePusher = () => useContext(PusherContext);
+
+export default PusherProvider;

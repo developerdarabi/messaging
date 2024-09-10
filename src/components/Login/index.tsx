@@ -1,40 +1,17 @@
 import { FormEvent, useState } from 'react';
-import { UserType } from '../../types';
+import { useAuth } from '../../provider/Auth';
 import Container from '../ui/Container';
 
-export default function Login({ changeUser }: { changeUser: (user: UserType) => void }) {
+export default function Login() {
+
+    const { login } = useAuth()
 
     const [name, setName] = useState<string>('')
 
     const handleLoginUser = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (name.trim() === '') {
-            alert('Enter name')
-            return
-        }
-
-        try {
-            const data = await fetch('http://localhost:8080/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name
-                }),
-            });
-            if (!data.ok) {
-                throw new Error(data.statusText)
-            }
-            const response = await data.json()
-            localStorage.setItem('user', JSON.stringify(response.user))
-            changeUser(response.user)
-            // setName('')
-        } catch (error) {
-            console.log(error);
-
-        }
+        login(name)
 
     }
 
