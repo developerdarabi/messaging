@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../types';
+import Cookies from 'universal-cookie';
 
 
 // Define the shape of the AuthContext
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || "") : null);
 
+    const coockies = new Cookies()
     const navigate = useNavigate();
 
     const login = async (name: string) => {
@@ -23,7 +25,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             alert('Enter name');
             return;
         }
-
         try {
             const response = await fetch('http://localhost:8080/users', {
                 method: 'POST',
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const data = await response.json();
 
             const loggedInUser: UserType = data.user;
-
+            
             localStorage.setItem('user', JSON.stringify(loggedInUser));
             setUser(loggedInUser);
             return navigate("/");
