@@ -1,10 +1,13 @@
 import { useState } from "react";
 import SyncSearch from "../SyncSearch";
 import SearchedUsers from "../SearchedUsers";
+import { useSelectedChat } from "../../provider/SelectedChat";
 
-export default function Contacts({selectChat}:any) {
+export default function Contacts() {
     const [users, setUsers] = useState(null)
     const [query, setQuery] = useState('')
+
+    const {selectChat} = useSelectedChat()
 
     const onSearch = async (searchedWord: string) => {
         console.log(searchedWord);
