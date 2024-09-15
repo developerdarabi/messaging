@@ -13,16 +13,14 @@ export default function PusherProvider({ children }: any) {
         Pusher.logToConsole = true
         const pusherInstance = new Pusher('eff84010cad346d22491', {
             cluster: 'ap3',
-            //@ts-ignore
-            encrypted: true,
-            authEndpoint: 'http://localhost:8080/pusher/auth',
+            authEndpoint : 'http://localhost:8080/pusher/auth',
             auth: {
-                headers: {
-                    "Authorization": "Bearer " + coockies.get('token'),
-                    "Access-Control-Allow-Origin": "*"
+                headers:{
+                    "Authorization": "Bearer" + coockies.get('token'),
                 },
-            }
+            },
         });
+        //@ts-ignore
         setPusher(pusherInstance)
     }, [])
 

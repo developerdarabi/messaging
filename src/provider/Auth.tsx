@@ -7,7 +7,7 @@ import { UserType } from '../types';
 // Define the shape of the AuthContext
 interface AuthContextType {
     user: UserType | null;
-    login: (name: string) => Promise<void>;
+    login: (username: string,password:string) => Promise<void>;
 }
 
 // Create the AuthContext with the type
@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             const data = await response.json();
-            console.log(data);
             
             const loggedInUser: UserType = data.user;
             setUser(loggedInUser);
@@ -88,6 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
+        //@ts-ignore
         <AuthContext.Provider value={{ user, login }}>
             {children}
         </AuthContext.Provider>
