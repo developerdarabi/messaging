@@ -1,10 +1,13 @@
-import Pusher from 'pusher-js'
-import { createContext, useContext, useEffect, useState } from 'react'
+import Pusher from 'pusher-js';
+import { createContext, useContext, useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 
 const PusherContext = createContext(null)
 
 export default function PusherProvider({ children }: any) {
     const [pusher, setPusher] = useState(null)
+
+    const coockies = new Cookies()
 
     useEffect(() => {
         Pusher.logToConsole = true
@@ -15,7 +18,7 @@ export default function PusherProvider({ children }: any) {
             authEndpoint: 'http://localhost:8080/pusher/auth',
             auth: {
                 headers: {
-                    "Authorization": "Bearer YOUR_JWT_TOKEN",
+                    "Authorization": "Bearer " + coockies.get('token'),
                     "Access-Control-Allow-Origin": "*"
                 },
             }
