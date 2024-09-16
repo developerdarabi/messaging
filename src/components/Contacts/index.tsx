@@ -10,7 +10,6 @@ export default function Contacts() {
     const {selectChat} = useSelectedChat()
 
     const onSearch = async (searchedWord: string) => {
-        console.log(searchedWord);
         try {
             const data = await fetch('http://localhost:8080/users/search', {
                 method: 'POST',
@@ -18,7 +17,7 @@ export default function Contacts() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: searchedWord
+                    username: searchedWord
                 }),
             });
             if (!data.ok) {

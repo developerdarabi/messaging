@@ -5,7 +5,7 @@ export default function SearchedUsers({ users,onClickUser }: any) {
 
     return users.map((user:any)=>(
         <div className="w-full p-4 rounded-xl bg-gray-100 my-4 cursor-pointer hover:bg-gray-200" onClick={()=>onClickUser(user)}>
-            <span className="text-sm font-medium">{user.name}</span>
+            <span className="text-sm font-medium">{user.username}</span>
         </div>
     ))
 }

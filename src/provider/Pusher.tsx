@@ -2,6 +2,7 @@ import Pusher from 'pusher-js';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth } from './Auth';
 import { useSelectedChat } from './SelectedChat';
+import Cookies from 'universal-cookie';
 
 const PusherContext = createContext(null);
 
@@ -9,7 +10,7 @@ export const PusherProvider = ({ children }:{children:React.ReactNode}) => {
     const [pusher, setPusher] = useState(null);
 
     const { addToMessages, chat: { chat } } = useSelectedChat()
-
+    const coockies = new Cookies()
     const { user } = useAuth()
 
     const isMounted = useRef<boolean>(false)
@@ -22,7 +23,12 @@ export const PusherProvider = ({ children }:{children:React.ReactNode}) => {
                 Pusher.logToConsole = true;
                 const pusherInstance = new Pusher('eff84010cad346d22491', {
                     cluster: 'ap3',
-                    authEndpoint: 'http://localhost:8080/pusher/auth'
+                    authEndpoint: 'http://localhost:8080/pusher/auth',
+                    auth: {
+                        headers:{
+                            "Authorization": "Bearer " + coockies.get('token'),
+                        },
+                    },
                 });
                 //@ts-ignore
                 setPusher(pusherInstance);
