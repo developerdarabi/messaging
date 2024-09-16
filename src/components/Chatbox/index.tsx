@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { useAuth } from '../../provider/Auth';
 import { useMessage } from '../../provider/Message';
 import { useSelectedChat } from '../../provider/SelectedChat';
@@ -34,7 +33,7 @@ function ChatBox() {
                 message: messageObject.message,
                 date: messageObject.date
             },
-            onSuccess:()=>{
+            onSuccess: () => {
                 changeMessage('')
             }
         })
@@ -43,7 +42,7 @@ function ChatBox() {
     return (
         <Container component={'form'} onSubmit={handleSubmit}>
             <h1 className="text-2xl font-bold">Start chating</h1>
-            <div className='h-[70vh] overflow-auto flex flex-col gap-4'>
+            <div className='h-[75vh] overflow-auto flex flex-col gap-4'>
                 <Messages messages={messages} />
             </div>
             <input value={message} onChange={e => changeMessage(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Enter message' />

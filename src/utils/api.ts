@@ -6,15 +6,18 @@ interface fetchProps {
     method?: 'POST' | 'GET' | 'PUT' | 'DELETE',
     headers?: Record<string, string>,
     body?: any,
-    loadingFor?: { for: string }
-    error?: { for: string, error: any }
+    loadingFor?: LoadingType
+    error?: errorType
     onSuccess?: (data: any) => void
     onError?: (data: any) => void
 }
 
-export const useFetch = () => {
-    const [isLoading, setIsLoading] = useState<false | { for: string }>(false)
-    const [isError, setIsError] = useState<false | { for: string, stack: any }>(false)
+type LoadingType = false | { for: string }
+type errorType = false | { for: string, stack: any }
+
+export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: LoadingType, isError: errorType }] => {
+    const [isLoading, setIsLoading] = useState<LoadingType>(false)
+    const [isError, setIsError] = useState<errorType>(false)
 
     const coockies = new Cookies()
 
@@ -44,6 +47,7 @@ export const useFetch = () => {
             });
             onSuccess(await response.json())
         } catch (errorMsg) {
+            //@ts-ignore
             setIsError({ ...error, stack: errorMsg })
             onError(errorMsg)
         }

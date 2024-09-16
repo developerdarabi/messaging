@@ -2,12 +2,13 @@ import { createContext, ReactNode, useContext, useEffect, useRef, useState } fro
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import { UserType } from '../types';
+import { useFetch } from '../utils/api';
 
 
 // Define the shape of the AuthContext
 interface AuthContextType {
     user: UserType | null;
-    login: (username: string,password:string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
 }
 
 // Create the AuthContext with the type
@@ -17,44 +18,32 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || "") : null);
 
-    const coockies = new Cookies()
+    const cookies = new Cookies()
     const navigate = useNavigate();
 
     const isMounted = useRef(false)
 
+    const [fetch] = useFetch()
+
     useEffect(() => {
         if (!isMounted.current) {
-            const token = coockies.get('token')
+            const token = cookies.get('token')
             if (token) {
-                getUserInfo(token)
+                getUserInfo()
             }
             isMounted.current = true
         }
     }, [])
-    console.log(user);
-    
-    const getUserInfo = async (token: string) => {
-        try {
-            const response = await fetch('http://localhost:8080/auth/info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-            });
 
-            if (!response.ok) {
-                throw new Error(response.statusText);
+    const getUserInfo = async () => {
+        await fetch({
+            url: 'auth/info',
+            onSuccess: (response) => {
+                const loggedInUser: UserType = response.user;
+                setUser(loggedInUser);
+                return navigate("/");
             }
-
-            const data = await response.json();
-            
-            const loggedInUser: UserType = data.user;
-            setUser(loggedInUser);
-            return navigate("/");
-        } catch (error) {
-            console.error(error);
-        }
+        })
     }
 
     const login = async (username: string, password: String) => {
@@ -62,28 +51,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             alert('Enter username');
             return;
         }
-        try {
-            const response = await fetch('http://localhost:8080/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (!response.ok) {
-                throw new Error(response.statusText);
+        await fetch({
+            url: 'auth',
+            body: { username, password },
+            onSuccess: (response) => {
+                const loggedInUser: UserType = response.user;
+                cookies.set('token', response.token)
+                setUser(loggedInUser);
+                return navigate("/");
             }
-
-            const data = await response.json();
-
-            const loggedInUser: UserType = data.user;
-            coockies.set('token', data.token)
-            setUser(loggedInUser);
-            return navigate("/");
-        } catch (error) {
-            console.error(error);
-        }
+        })
     };
 
     return (
