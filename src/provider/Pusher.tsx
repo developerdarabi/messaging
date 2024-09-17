@@ -32,7 +32,7 @@ export const PusherProvider = ({ children }:{children:React.ReactNode}) => {
                 });
                 //@ts-ignore
                 setPusher(pusherInstance);
-                channel = pusherInstance.subscribe(`private-chat-${user._id}`)
+                channel = pusherInstance.subscribe(`private-notification-${user._id}`)
                 channel.bind('new-message', (message:any) => {
                     console.log('sssssssssssssss');
                     console.log(message);
