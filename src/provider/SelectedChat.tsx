@@ -16,7 +16,7 @@ interface ChatState {
 }
 
 interface ChatType {
-    _id:string
+    _id: string
 }
 
 // Create the MessageContext with the type
@@ -24,6 +24,7 @@ const SelectedChatContext = createContext<SelectedChatContextType | null>(null);
 
 // MessageProvider Component
 export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
+
     const [chat, setChat] = useState<ChatState>({
         chat: null,
         messages: null

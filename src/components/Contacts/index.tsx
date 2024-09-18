@@ -3,13 +3,16 @@ import { useSelectedChat } from "../../provider/SelectedChat";
 import { useFetch } from "../../utils/api";
 import SearchedUsers from "../SearchedUsers";
 import SyncSearch from "../SyncSearch";
+import { useAuth } from "../../provider/Auth";
 
 export default function Contacts() {
     const [users, setUsers] = useState(null)
     const [query, setQuery] = useState('')
 
     const { selectChat } = useSelectedChat()
-
+    const {user} = useAuth()
+    console.log(user);
+    
     const [fetch] = useFetch()
 
     const onSearch = async (searchedWord: string) => {

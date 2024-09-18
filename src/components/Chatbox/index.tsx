@@ -3,6 +3,7 @@ import { useAuth } from '../../provider/Auth';
 import { useMessage } from '../../provider/Message';
 import { useSelectedChat } from '../../provider/SelectedChat';
 import { MessageType } from '../../types';
+import { generatePvChatName } from '../../utils';
 import { useFetch } from '../../utils/api';
 import Messages from '../Messages';
 import Container from '../ui/Container';
@@ -22,7 +23,7 @@ function ChatBox() {
         if (isLoading || message.trim() === '') return
 
         // Post message to server
-        const messageObject: MessageType = { date: new Date().toString(), userId: user._id, message, isUserMessage: true }
+        const messageObject: MessageType = { createdAt: new Date().toString(), author: user._id, text:message, isUserMessage: true }
 
         addToMessages(messageObject)
         await fetch({
@@ -30,8 +31,8 @@ function ChatBox() {
             method: 'POST',
             body: {
                 userId: chat._id,
-                message: messageObject.message,
-                date: messageObject.date
+                message: messageObject.text,
+                channelId: `presence-chat-${generatePvChatName(user._id, chat._id)}`
             },
             onSuccess: () => {
                 changeMessage('')
