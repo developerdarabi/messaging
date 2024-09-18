@@ -11,7 +11,9 @@ export default function Contacts() {
 
     const { selectChat } = useSelectedChat()
     const {user} = useAuth()
+    console.log('iiiiiiiiiiiiiiiiiiiiiiiii');
     console.log(user);
+    console.log('iiiiiiiiiiiiiiiiiiiiiiiii');
     
     const [fetch] = useFetch()
 

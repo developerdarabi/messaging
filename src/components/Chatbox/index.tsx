@@ -42,7 +42,6 @@ function ChatBox() {
 
     return (
         <Container component={'form'} onSubmit={handleSubmit}>
-            <h1 className="text-2xl font-bold">Start chating</h1>
             <div className='h-[75vh] overflow-auto flex flex-col gap-4'>
                 <Messages messages={messages} />
             </div>

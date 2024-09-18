@@ -41,7 +41,7 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
                     console.log(message);
                     console.log('user get online');
                 })
-
+                
                 const notificationsChannel = pusherInstance.subscribe(`private-notification-${user._id}`)
                 setChannels(prev => [...(prev || []), { name: 'notifications_channel', channel: notificationsChannel }])
                 notificationsChannel.bind('new-message', (message: any) => {
