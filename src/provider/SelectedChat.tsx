@@ -1,8 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { MessageType } from '../types';
-import { useAuth } from './Auth';
-import { generatePvChatName } from '../utils';
-import { usePusher } from './Pusher';
 
 
 // Define the shape of the MessageContext
@@ -19,7 +16,7 @@ interface ChatState {
 }
 
 interface ChatType {
-    _id:string
+    _id: string
 }
 
 // Create the MessageContext with the type
@@ -27,22 +24,19 @@ const SelectedChatContext = createContext<SelectedChatContextType | null>(null);
 
 // MessageProvider Component
 export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
-    const pusher = usePusher()
+
     const [chat, setChat] = useState<ChatState>({
         chat: null,
         messages: null
     })
-    console.log(pusher);
-    
+
     const changeMessages = (messages: MessageType[]) => setChat(prev => {
         return { ...prev, messages }
     })
     const addToMessages = (message: MessageType) => setChat(prev => {
         return { ...prev, messages: [...prev.messages || [], message] }
     })
-    const selectChat = (chat: ChatType, messages: any = []) => {
-        setChat({ chat, messages })
-    }
+    const selectChat = (chat: ChatType, messages: any = []) => setChat({ chat, messages })
 
     return (
         <SelectedChatContext.Provider value={{ chat, changeMessages, addToMessages, selectChat }}>

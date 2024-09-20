@@ -9,6 +9,7 @@ const PusherContext = createContext(null);
 
 export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
     const [pusher, setPusher] = useState(null);
+    const [channels, setChannels] = useState<null | [{ name: string, channel: any }]>(null);
 
     const { addToMessages, chat: { chat } } = useSelectedChat()
     const coockies = new Cookies()
@@ -16,7 +17,6 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
 
     const isMounted = useRef<boolean>(false)
 
-    var channel
 
     useEffect(() => {
         if (user) {
@@ -33,51 +33,65 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
                 });
                 //@ts-ignore
                 setPusher(pusherInstance);
-                channel = pusherInstance.subscribe(`private-notification-${user._id}`)
-                channel.bind('new-message', (message: any) => {
+
+                const globalChannel = pusherInstance.subscribe(`presence-app`)
+                setChannels(prev => [...(prev || []), { name: 'global_channel', channel: globalChannel }])
+                globalChannel.bind('pusher:member_added', (message: any) => {
+                    console.log('user get online');
+                    console.log(message);
+                    console.log('user get online');
+                })
+                
+                const notificationsChannel = pusherInstance.subscribe(`private-notification-${user._id}`)
+                setChannels(prev => [...(prev || []), { name: 'notifications_channel', channel: notificationsChannel }])
+                notificationsChannel.bind('new-message', (message: any) => {
                     console.log('sssssssssssssss');
                     console.log(message);
                     console.log('sssssssssssssss');
-                    chat && addToMessages({ ...message, isUserMessage: false })
+
                 })
+
                 isMounted.current = true
             }
         }
         return () => {
-            channel?.unbind('new-message')
+            // channel?.unbind('new-message')
             //@ts-ignore
-            pusher?.unsubscribe(`private-notification-${user._id}`)
+            pusher?.unsubscribe(`private-chat-${user._id}`)
+            //@ts-ignore
+            pusher?.unsubscribe(`presence-app`)
+            getChannelByName(`private-notification-${user?._id}`)?.channel?.unbind('notifications_channel')
         }
     }, [user]);
-    var channel1 = null
+
     useEffect(() => {
-        if (chat) {
-            const generatedChannelId = generatePvChatName(chat._id, user._id)
-            channel1 = pusher.subscribe(generatedChannelId)
-            channel1.bind('new-message', (message: any) => {
-                console.log('zzzzzzzzzzzzz');
+        if (chat && user) {
+            const chatChannel = pusher?.subscribe(`presence-chat-${generatePvChatName(user._id, chat._id)}`)
+            setChannels(prev => [...(prev || []), { name: 'chat_channel', channel: chatChannel }])
+            chatChannel.bind('new-message', (message: any) => {
+                console.log('chatttttttttttttttttttttt');
                 console.log(message);
-                console.log('zzzzzzzzzzzzz');
-            })
-            channel1.bind('pusher:member_added',()=>{
-                console.log('user onlineeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-                
+                console.log('chatttttttttttttttttttttt');
+                if(message.message.author!==user._id){
+                    addToMessages({ ...message.message, isUserMessage: false })
+                }
             })
         }
         return () => {
-            const generatedChannelId = generatePvChatName(chat?._id, user?._id)
-            channel1?.unbind('new-message')
-            //@ts-ignore
-            pusher?.unsubscribe(generatedChannelId)
+            pusher?.unsubscribe(`presence-chat-${generatePvChatName(user._id, chat._id)}`)
+            getChannelByName(`chat_channel`)?.channel?.unbind('new-message')
         }
     }, [chat])
-    console.log('qqqqqqqqqqqqqqqqqqq');
-    
-    console.log(channel1);
-    console.log('qqqqqqqqqqqqqqqqqqq');
-    
+
+    const subscribeChat = (channel, channelName) => {
+        const notificationsChannel = pusher?.subscribe(channel)
+        setChannels(prev => [...(prev || []), { name: channelName, channel: notificationsChannel }])
+    }
+
+    const getChannelByName = (channelName: string) => channels?.find((channel) => channel.name === channelName)
+
     return (
-        <PusherContext.Provider value={pusher}>
+        <PusherContext.Provider value={{ pusher, channels, functions: { subscribeChat } }}>
             {children}
         </PusherContext.Provider>
     );

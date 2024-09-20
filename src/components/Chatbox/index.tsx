@@ -17,15 +17,13 @@ function ChatBox() {
 
     const [fetch, { isLoading }] = useFetch()
 
-    const generatedChannelId = generatePvChatName(chat?._id, user?._id)
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         if (isLoading || message.trim() === '') return
 
         // Post message to server
-        const messageObject: MessageType = { date: new Date().toString(), userId: user._id, message, isUserMessage: true }
+        const messageObject: MessageType = { createdAt: new Date().toString(), author: user._id, text:message, isUserMessage: true }
 
         addToMessages(messageObject)
         await fetch({
@@ -33,8 +31,8 @@ function ChatBox() {
             method: 'POST',
             body: {
                 userId: chat._id,
-                message: messageObject.message,
-                channelId: generatedChannelId
+                message: messageObject.text,
+                channelId: `presence-chat-${generatePvChatName(user._id, chat._id)}`
             },
             onSuccess: () => {
                 changeMessage('')
@@ -44,7 +42,6 @@ function ChatBox() {
 
     return (
         <Container component={'form'} onSubmit={handleSubmit}>
-            <h1 className="text-2xl font-bold">Start chating</h1>
             <div className='h-[75vh] overflow-auto flex flex-col gap-4'>
                 <Messages messages={messages} />
             </div>

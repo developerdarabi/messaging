@@ -1,8 +1,8 @@
 export interface MessageType{
-    date:string
-    userId:string
-    message:string
+    createdAt:string
+    text:string
     isUserMessage:boolean
+    author:string
 }
 
 export interface UserType{
