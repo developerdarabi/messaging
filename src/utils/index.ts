@@ -4,3 +4,7 @@ export function idGenerator() {
     };
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
+
+export const generatePvChatName=(userAId:string,userBId:string)=>{
+    return 'presence-chat-'+[userAId,userBId].sort().join('-')
+}

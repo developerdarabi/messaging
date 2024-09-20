@@ -3,6 +3,7 @@ import { useAuth } from '../../provider/Auth';
 import { useMessage } from '../../provider/Message';
 import { useSelectedChat } from '../../provider/SelectedChat';
 import { MessageType } from '../../types';
+import { generatePvChatName } from '../../utils';
 import { useFetch } from '../../utils/api';
 import Messages from '../Messages';
 import Container from '../ui/Container';
@@ -15,6 +16,8 @@ function ChatBox() {
     if (!chat || !user) return <Container className="h-full flex items-center justify-center bg-transparent"><h1 className='text-sm font-medium'>Start chating by select one </h1></Container>
 
     const [fetch, { isLoading }] = useFetch()
+
+    const generatedChannelId = generatePvChatName(chat?._id, user?._id)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -31,7 +34,7 @@ function ChatBox() {
             body: {
                 userId: chat._id,
                 message: messageObject.message,
-                date: messageObject.date
+                channelId: generatedChannelId
             },
             onSuccess: () => {
                 changeMessage('')
