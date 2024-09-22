@@ -7,4 +7,5 @@ export interface MessageType{
 
 export interface UserType{
     _id:string
+    username:String
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import { UserType } from '../types';
 import { useFetch } from '../utils/api';
+import { useContacts } from './contacts';
 
 
 // Define the shape of the AuthContext
@@ -17,6 +18,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 // AuthProvider Component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || "") : null);
+
+    const {changeContacts} = useContacts()
 
     const cookies = new Cookies()
     const navigate = useNavigate();
@@ -41,6 +44,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             onSuccess: (response) => {
                 const loggedInUser: UserType = response.user;
                 setUser(loggedInUser);
+                changeContacts([
+                    ...loggedInUser.channels,
+                    {
+                        _id:'af5a4df5adf',
+                        username:'One '
+                    },
+                    {
+                        _id:'415dfa',
+                        username:'One '
+                    },
+                    {
+                        _id:'a4df5a4df',
+                        username:'Two '
+                    },
+                    {
+                        _id:'5ad2f54adf',
+                        username:'Three '
+                    },
+                    {
+                        _id:'ad7f9adf',
+                        username:'Four '
+                    },
+                    {
+                        _id:'a5dfa41df',
+                        username:'Five '
+                    },
+                ])
                 return navigate("/");
             }
         })

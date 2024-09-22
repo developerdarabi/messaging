@@ -7,19 +7,22 @@ import AuthProvider from './provider/Auth.tsx'
 import MessageProvider from './provider/Message.tsx'
 import PusherProvider from './provider/Pusher.tsx'
 import SelectedChatProvider from './provider/SelectedChat.tsx'
+import ContactsProvider from './provider/contacts.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <SelectedChatProvider>
-          <MessageProvider>
-            <PusherProvider>
-              <App />
-            </PusherProvider>
-          </MessageProvider>
-        </SelectedChatProvider>
-      </AuthProvider>
+      <ContactsProvider>
+        <AuthProvider>
+          <SelectedChatProvider>
+            <MessageProvider>
+              <PusherProvider>
+                <App />
+              </PusherProvider>
+            </MessageProvider>
+          </SelectedChatProvider>
+        </AuthProvider>
+      </ContactsProvider>
     </BrowserRouter>
   </StrictMode>,
 )
