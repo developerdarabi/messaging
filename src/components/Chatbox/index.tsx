@@ -1,9 +1,9 @@
 
 import { useAuth } from '../../provider/Auth';
 import { useMessage } from '../../provider/Message';
+import { usePusher } from '../../provider/Pusher';
 import { useSelectedChat } from '../../provider/SelectedChat';
 import { MessageType } from '../../types';
-import { generatePvChatName } from '../../utils';
 import { useFetch } from '../../utils/api';
 import Messages from '../Messages';
 import Container from '../ui/Container';
@@ -12,6 +12,10 @@ function ChatBox() {
     const { chat: { messages, chat }, addToMessages } = useSelectedChat()
     const { message, changeMessage } = useMessage()
     const { user } = useAuth()
+
+    const { functions: { subscribeChat } } = usePusher()
+    console.log(messages);
+    console.log('sssssssssssssss');
 
     if (!chat || !user) return <Container className="h-full flex items-center justify-center bg-transparent"><h1 className='text-sm font-medium'>Start chating by select one </h1></Container>
 
@@ -22,28 +26,46 @@ function ChatBox() {
 
         if (isLoading || message.trim() === '') return
 
-        // Post message to server
-        const messageObject: MessageType = { createdAt: new Date().toString(), author: user._id, text:message, isUserMessage: true }
+        let contactedUser = chat
 
+        if (!chat.channelId) {
+            await fetch({
+                url: 'pusher/startChat',
+                method: 'POST',
+                body: {
+                    users: [user._id, chat._id],
+                },
+                onSuccess: (channel) => {
+                    contactedUser = channel
+                    subscribeChat(channel.channelId)
+                }
+            })
+        }
+
+        const messageObject: MessageType = { createdAt: new Date().toString(), author: user._id, text: message, isUserMessage: true }
         addToMessages(messageObject)
         await fetch({
             url: 'pusher/private',
             method: 'POST',
             body: {
-                userId: chat._id,
+                userId: contactedUser._id,
                 message: messageObject.text,
-                channelId: `presence-chat-${generatePvChatName(user._id, chat._id)}`
+                channelId: contactedUser.channelId
             },
             onSuccess: () => {
                 changeMessage('')
             }
         })
+
+        // Post message to server
+
     };
+    const getIsUserWriteMessage = authorId => authorId === user._id
 
     return (
         <Container component={'form'} onSubmit={handleSubmit}>
             <div className='h-[75vh] overflow-auto flex flex-col gap-4'>
-                <Messages messages={messages} />
+                <Messages messages={messages} getIsUserWriteMessage={getIsUserWriteMessage}/>
             </div>
             <input value={message} onChange={e => changeMessage(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Enter message' />
             <button type='submit' className='bg-indigo-400 rounded-xl w-full p-4 text-white'>Start</button>

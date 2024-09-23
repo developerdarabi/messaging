@@ -41,13 +41,13 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
                     console.log(message);
                     console.log('user get online');
                 })
-                
+
                 const notificationsChannel = pusherInstance.subscribe(`private-notification-${user._id}`)
                 setChannels(prev => [...(prev || []), { name: 'notifications_channel', channel: notificationsChannel }])
                 notificationsChannel.bind('new-message', (message: any) => {
-                    console.log('sssssssssssssss');
+                    console.log('Notification');
                     console.log(message);
-                    console.log('sssssssssssssss');
+                    console.log('Notification');
 
                 })
 
@@ -65,21 +65,23 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user]);
 
     useEffect(() => {
-        if (chat && user) {
-            const chatChannel = pusher?.subscribe(`presence-chat-${generatePvChatName(user._id, chat._id)}`)
+        if (chat && chat.channelId && user) {
+            const chatChannel = pusher?.subscribe(chat.channelId)
             setChannels(prev => [...(prev || []), { name: 'chat_channel', channel: chatChannel }])
             chatChannel.bind('new-message', (message: any) => {
                 console.log('chatttttttttttttttttttttt');
                 console.log(message);
                 console.log('chatttttttttttttttttttttt');
-                if(message.message.author!==user._id){
+                if (message.message.author !== user._id) {
                     addToMessages({ ...message.message, isUserMessage: false })
                 }
             })
         }
         return () => {
-            pusher?.unsubscribe(`presence-chat-${generatePvChatName(user._id, chat._id)}`)
-            getChannelByName(`chat_channel`)?.channel?.unbind('new-message')
+            if(chat && chat.channelId && user){
+                pusher?.unsubscribe(chat.channelId)
+                getChannelByName(`chat_channel`)?.channel?.unbind('new-message')
+            }
         }
     }, [chat])
 

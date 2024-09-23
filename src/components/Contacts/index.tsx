@@ -17,9 +17,8 @@ export default function Contacts() {
     const { contacts } = useContacts()
 
     const { selectChat } = useSelectedChat()
-    const { user } = useAuth()
     console.log('iiiiiiiiiiiiiiiiiiiiiiiii');
-    console.log(user);
+    console.log(contacts);
     console.log('iiiiiiiiiiiiiiiiiiiiiiiii');
 
     const [fetch] = useFetch()
@@ -55,13 +54,13 @@ export default function Contacts() {
                 className=' w-full p-2 rounded-full border mb-2 focus:outline-none bg-[#F6F8FA]'
                 placeholder='Enter users'
             />
-            <div className={`absolute left-[14px] z-[100] top-[62px] w-[94%] bg-[#F6F8FA] h-full p-2 rounded-xl transition-all duration-100 delay-100 ease-in-out ${isSearchedFocus ? 'opacity-100 h-full' : 'opacity-0 h-0'}`}>
+            <div className={`absolute left-[14px] z-[100] top-[62px] w-[94%] bg-[#F6F8FA] h-full p-2 rounded-xl transition-all duration-100 delay-100 ease-in-out ${isSearchedFocus ? 'opacity-100 h-full block' : 'hidden opacity-0 h-0'}`}>
                 <IoCloseOutline size={25} className="cursor-pointer" onClick={onCloseSearchBox} />
                 <SearchedUsers users={users} onClickUser={selectChat} />
             </div>
             <div className="w-full flex flex-col gap-3">
                 {contacts.map((user: UserType) => (
-                    <UserProfileRow key={user._id} onClickUser={selectChat} user={user} className="hover:bg-[#F6F8FA]  transition-all delay-75 duration-75 ease-in-out"/>
+                    <UserProfileRow key={user._id} onClickUser={()=>selectChat(user)} user={user?.users?.[0]||user} className="hover:bg-[#F6F8FA]  transition-all delay-75 duration-75 ease-in-out"/>
                 ))}
             </div>
         </div>

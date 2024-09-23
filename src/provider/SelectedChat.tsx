@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { MessageType } from '../types';
+import { useFetch } from '../utils/api';
 
 
 // Define the shape of the MessageContext
@@ -24,7 +25,7 @@ const SelectedChatContext = createContext<SelectedChatContextType | null>(null);
 
 // MessageProvider Component
 export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
-
+    const [fetch] = useFetch()
     const [chat, setChat] = useState<ChatState>({
         chat: null,
         messages: null
@@ -36,7 +37,15 @@ export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
     const addToMessages = (message: MessageType) => setChat(prev => {
         return { ...prev, messages: [...prev.messages || [], message] }
     })
-    const selectChat = (chat: ChatType, messages: any = []) => setChat({ chat, messages })
+    const selectChat = async (chat: ChatType, messages: any = []) => {
+        await fetch({
+            url: 'channels/' + chat.channelId,
+            method: 'GET',
+            onSuccess: ({messages,...chat}) => {
+                setChat({chat,messages})
+            }
+        })
+    }
 
     return (
         <SelectedChatContext.Provider value={{ chat, changeMessages, addToMessages, selectChat }}>

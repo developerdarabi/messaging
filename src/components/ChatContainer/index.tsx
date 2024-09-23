@@ -1,4 +1,5 @@
 import { useAuth } from "../../provider/Auth";
+import { useSelectedChat } from "../../provider/SelectedChat";
 import ChatBox from "../Chatbox";
 import Contacts from "../Contacts";
 import UserProfileRow from "../UserProfileRow";

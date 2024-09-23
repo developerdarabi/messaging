@@ -48,18 +48,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     ...loggedInUser.channels,
                     {
                         _id:'af5a4df5adf',
+                        channelId:'af5a4df5adf',
                         username:'One '
                     },
                     {
                         _id:'415dfa',
+                        channelId:'415dfa',
                         username:'One '
                     },
                     {
                         _id:'a4df5a4df',
+                        channelId:'a4df5a4df',
                         username:'Two '
                     },
                     {
                         _id:'5ad2f54adf',
+                        channelId:'5ad2f54adf',
                         username:'Three '
                     },
                     {
@@ -68,6 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     },
                     {
                         _id:'a5dfa41df',
+                        channelId:'a5dfa41df',
                         username:'Five '
                     },
                 ])
@@ -88,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const loggedInUser: UserType = response.user;
                 cookies.set('token', response.token)
                 setUser(loggedInUser);
+                getUserInfo()
                 return navigate("/");
             }
         })

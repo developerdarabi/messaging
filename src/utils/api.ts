@@ -15,14 +15,15 @@ interface fetchProps {
 type LoadingType = false | { for: string }
 type errorType = false | { for: string, stack: any }
 
-export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: LoadingType, isError: errorType }] => {
+export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: LoadingType, isError: errorType, data: any }] => {
     const [isLoading, setIsLoading] = useState<LoadingType>(false)
     const [isError, setIsError] = useState<errorType>(false)
+    const [data, setData] = useState(null)
 
     const coockies = new Cookies()
 
     const fetchHandler = async (props: fetchProps) => {
-        const { url, method = 'POST', headers = {}, body = {}, loadingFor = { for: 'fetch' }, error = { for: 'fetch' }, onError = () => { }, onSuccess = () => { } } = props
+        const { url, method = 'POST', headers = {}, body = null, loadingFor = { for: 'fetch' }, error = { for: 'fetch' }, onError = () => { }, onSuccess = () => { } } = props
 
         let additionalHeaders = {}
 
@@ -43,9 +44,12 @@ export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: 
                     ...additionalHeaders,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(body),
+                ...(body ? { body: JSON.stringify(body) } : {})
             });
-            onSuccess(await response.json())
+            const data = await response.json()
+            onSuccess(data)
+            setData(data)
+            return data
         } catch (errorMsg) {
             //@ts-ignore
             setIsError({ ...error, stack: errorMsg })
@@ -55,5 +59,5 @@ export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: 
             setIsLoading(false)
         }
     }
-    return [fetchHandler, { isLoading, isError }]
+    return [fetchHandler, { isLoading, isError, data }]
 }
