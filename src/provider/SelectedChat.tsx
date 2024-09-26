@@ -38,13 +38,20 @@ export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
         return { ...prev, messages: [...prev.messages || [], message] }
     })
     const selectChat = async (chat: ChatType, messages: any = []) => {
-        await fetch({
-            url: 'channels/' + chat.channelId,
-            method: 'GET',
-            onSuccess: ({messages,...chat}) => {
-                setChat({chat,messages})
-            }
-        })
+        if(chat.channelId){
+            await fetch({
+                url: 'channels/' + chat.channelId,
+                method: 'GET',
+                onSuccess: ({messages,...chat}) => {
+                    setChat({chat,messages})
+                }
+            })
+            
+        }
+        else{
+            setChat({chat,messages})
+
+        }
     }
 
     return (

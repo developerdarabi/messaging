@@ -9,13 +9,9 @@ import Messages from '../Messages';
 import Container from '../ui/Container';
 
 function ChatBox() {
-    const { chat: { messages, chat }, addToMessages } = useSelectedChat()
+    const { chat: { messages, chat }, addToMessages,selectChat } = useSelectedChat()
     const { message, changeMessage } = useMessage()
     const { user } = useAuth()
-
-    const { functions: { subscribeChat } } = usePusher()
-    console.log(messages);
-    console.log('sssssssssssssss');
 
     if (!chat || !user) return <Container className="h-full flex items-center justify-center bg-transparent"><h1 className='text-sm font-medium'>Start chating by select one </h1></Container>
 
@@ -37,7 +33,7 @@ function ChatBox() {
                 },
                 onSuccess: (channel) => {
                     contactedUser = channel
-                    subscribeChat(channel.channelId)
+                    selectChat({chat:channel,messages:[]})
                 }
             })
         }
