@@ -10,6 +10,7 @@ import { useContacts } from './contacts';
 interface AuthContextType {
     user: UserType | null;
     login: (username: string, password: string) => Promise<void>;
+    isLoading:boolean
 }
 
 // Create the AuthContext with the type
@@ -19,14 +20,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || "") : null);
 
-    const {changeContacts} = useContacts()
+    const { changeContacts } = useContacts()
 
     const cookies = new Cookies()
     const navigate = useNavigate();
 
     const isMounted = useRef(false)
 
-    const [fetch] = useFetch()
+    const [fetch,{isLoading}] = useFetch()
 
     useEffect(() => {
         if (!isMounted.current) {
@@ -44,38 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             onSuccess: (response) => {
                 const loggedInUser: UserType = response.user;
                 setUser(loggedInUser);
-                changeContacts([
-                    ...loggedInUser.channels,
-                    {
-                        _id:'af5a4df5adf',
-                        channelId:'af5a4df5adf',
-                        username:'One '
-                    },
-                    {
-                        _id:'415dfa',
-                        channelId:'415dfa',
-                        username:'One '
-                    },
-                    {
-                        _id:'a4df5a4df',
-                        channelId:'a4df5a4df',
-                        username:'Two '
-                    },
-                    {
-                        _id:'5ad2f54adf',
-                        channelId:'5ad2f54adf',
-                        username:'Three '
-                    },
-                    {
-                        _id:'ad7f9adf',
-                        username:'Four '
-                    },
-                    {
-                        _id:'a5dfa41df',
-                        channelId:'a5dfa41df',
-                        username:'Five '
-                    },
-                ])
+                changeContacts(loggedInUser.channels)
                 return navigate("/");
             }
         })
@@ -101,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         //@ts-ignore
-        <AuthContext.Provider value={{ user, login }}>
+        <AuthContext.Provider value={{ user, login,isLoading }}>
             {children}
         </AuthContext.Provider>
     );

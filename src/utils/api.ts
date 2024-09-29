@@ -46,10 +46,16 @@ export const useFetch = (): [(props: fetchProps) => Promise<void>, { isLoading: 
                 },
                 ...(body ? { body: JSON.stringify(body) } : {})
             });
-            const data = await response.json()
-            onSuccess(data)
-            setData(data)
-            return data
+            if (response.ok) {
+                const data = await response.json()
+                onSuccess(data)
+                setData(data)
+                return data
+            } else {
+                //@ts-ignore
+                setIsError({ ...error, stack: 'errorMsg' })
+                onError(response)
+            }
         } catch (errorMsg) {
             //@ts-ignore
             setIsError({ ...error, stack: errorMsg })

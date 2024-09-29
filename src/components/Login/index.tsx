@@ -1,13 +1,14 @@
 import { FormEvent, useState } from 'react';
+import sideBg from '../../assets/login/side_background.jpg';
+import sideImg from '../../assets/login/side_image.png';
 import { useAuth } from '../../provider/Auth';
 import AppLogo from '../AppLogo';
 import Container from '../ui/Container';
-import sideBg from '../../assets/login/side_background.jpg'
-import sideImg from '../../assets/login/side_image.png'
+import LoadingButton from '../Useable/LoadingButton';
 
 export default function Login() {
 
-    const { login } = useAuth()
+    const { login, isLoading } = useAuth()
 
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -27,7 +28,7 @@ export default function Login() {
                     <h6 className="tablet:text-md text-sm font-medium opacity-60">Welcome Please enter your details</h6>
                     <input value={username} onChange={e => setUsername(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Username' />
                     <input value={password} onChange={e => setPassword(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Password' />
-                    <button type="submit" className='bg-blue-600 rounded-xl w-full p-4 text-white'>Continue</button>
+                    <LoadingButton loading={isLoading}>Continue</LoadingButton>
                 </div>
                 <div className='flex items-center justify-center p-8'>
                     <p className='text-sm font-medium opacity-50 text-black text-center '>
@@ -36,8 +37,8 @@ export default function Login() {
                 </div>
             </div>
             <div className='relative items-center p-14 justify-center hidden tablet:flex'>
-                <img src={sideBg} className='absolute left-0 top-0 w-full h-full'/>
-                <img src={sideImg} className='z-[101] drop-shadow-2xl'/>
+                <img src={sideBg} className='absolute left-0 top-0 w-full h-full' />
+                <img src={sideImg} className='z-[101] drop-shadow-2xl' />
             </div>
         </Container>
     )
