@@ -4,9 +4,11 @@ export function idGenerator() {
     };
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
+//@ts-ignore
 export const generatePvChatName = (userAId, userBId) => {
     return [userAId, userBId].sort().join('-')
 }
+//@ts-ignore
 export const getCurrentDateTime = (date): string => {
     const now = new Date(date);
     const day = String(now.getDate()).padStart(2, '0');

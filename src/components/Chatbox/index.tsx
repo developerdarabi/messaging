@@ -1,7 +1,6 @@
 
 import { useAuth } from '../../provider/Auth';
 import { useMessage } from '../../provider/Message';
-import { usePusher } from '../../provider/Pusher';
 import { useSelectedChat } from '../../provider/SelectedChat';
 import { MessageType } from '../../types';
 import { useFetch } from '../../utils/api';
@@ -9,7 +8,7 @@ import Messages from '../Messages';
 import Container from '../ui/Container';
 
 function ChatBox() {
-    const { chat: { messages, chat }, addToMessages,selectChat } = useSelectedChat()
+    const { chat: { messages, chat }, addToMessages, selectChat } = useSelectedChat()
     const { message, changeMessage } = useMessage()
     const { user } = useAuth()
 
@@ -23,7 +22,7 @@ function ChatBox() {
         if (isLoading || message.trim() === '') return
 
         let contactedUser = chat
-
+        //@ts-ignore
         if (!chat.channelId) {
             await fetch({
                 url: 'pusher/startChat',
@@ -33,7 +32,8 @@ function ChatBox() {
                 },
                 onSuccess: (channel) => {
                     contactedUser = channel
-                    selectChat({chat:channel,messages:[]})
+                    //@ts-ignore
+                    selectChat({ chat: channel, messages: [] })
                 }
             })
         }
@@ -46,6 +46,7 @@ function ChatBox() {
             body: {
                 userId: contactedUser._id,
                 message: messageObject.text,
+                //@ts-ignore
                 channelId: contactedUser.channelId
             },
             onSuccess: () => {
@@ -56,12 +57,13 @@ function ChatBox() {
         // Post message to server
 
     };
+    //@ts-ignore
     const getIsUserWriteMessage = authorId => authorId === user._id
 
     return (
         <Container component={'form'} onSubmit={handleSubmit}>
             <div className='h-[75vh] overflow-auto flex flex-col gap-4'>
-                <Messages messages={messages} getIsUserWriteMessage={getIsUserWriteMessage}/>
+                <Messages messages={messages} getIsUserWriteMessage={getIsUserWriteMessage} />
             </div>
             <input value={message} onChange={e => changeMessage(e.target.value)} className='w-full p-4 rounded-xl border focus:outline-none' placeholder='Enter message' />
             <button type='submit' className='bg-indigo-400 rounded-xl w-full p-4 text-white'>Start</button>

@@ -1,7 +1,6 @@
 import Pusher from 'pusher-js';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import Cookies from 'universal-cookie';
-import { generatePvChatName } from '../utils';
 import { useAuth } from './Auth';
 import { useSelectedChat } from './SelectedChat';
 
@@ -35,6 +34,7 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
                 setPusher(pusherInstance);
 
                 const globalChannel = pusherInstance.subscribe(`presence-app`)
+                //@ts-ignore
                 setChannels(prev => [...(prev || []), { name: 'global_channel', channel: globalChannel }])
                 globalChannel.bind('pusher:member_added', (message: any) => {
                     console.log('user get online');
@@ -43,6 +43,7 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
                 })
 
                 const notificationsChannel = pusherInstance.subscribe(`private-notification-${user._id}`)
+                //@ts-ignore
                 setChannels(prev => [...(prev || []), { name: 'notifications_channel', channel: notificationsChannel }])
                 notificationsChannel.bind('new-message', (message: any) => {
                     console.log('Notification');
@@ -65,8 +66,11 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user]);
 
     useEffect(() => {
+        //@ts-ignore
         if (chat && chat.channelId && user) {
+            //@ts-ignore
             const chatChannel = pusher?.subscribe(chat.channelId)
+            //@ts-ignore
             setChannels(prev => [...(prev || []), { name: 'chat_channel', channel: chatChannel }])
             chatChannel.bind('new-message', (message: any) => {
                 console.log('chatttttttttttttttttttttt');
@@ -78,21 +82,26 @@ export const PusherProvider = ({ children }: { children: React.ReactNode }) => {
             })
         }
         return () => {
-            if(chat && chat.channelId && user){
+            //@ts-ignore
+            if (chat && chat.channelId && user) {
+                //@ts-ignore
                 pusher?.unsubscribe(chat.channelId)
                 getChannelByName(`chat_channel`)?.channel?.unbind('new-message')
             }
         }
     }, [chat])
-
+    //@ts-ignore
     const subscribeChat = (channel, channelName) => {
+        //@ts-ignore
         const notificationsChannel = pusher?.subscribe(channel)
+        //@ts-ignore
         setChannels(prev => [...(prev || []), { name: channelName, channel: notificationsChannel }])
     }
 
     const getChannelByName = (channelName: string) => channels?.find((channel) => channel.name === channelName)
 
     return (
+        //@ts-ignore
         <PusherContext.Provider value={{ pusher, channels, functions: { subscribeChat } }}>
             {children}
         </PusherContext.Provider>

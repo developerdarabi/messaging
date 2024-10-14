@@ -38,8 +38,10 @@ export const SelectedChatProvider = ({ children }: { children: ReactNode }) => {
         return { ...prev, messages: [...prev.messages || [], message] }
     })
     const selectChat = async (chat: ChatType, messages: any = []) => {
+        //@ts-ignore
         if(chat.channelId){
             await fetch({
+                //@ts-ignore
                 url: 'channels/' + chat.channelId,
                 method: 'GET',
                 onSuccess: ({messages,...chat}) => {

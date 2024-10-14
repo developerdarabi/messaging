@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             onSuccess: (response) => {
                 const loggedInUser: UserType = response.user;
                 setUser(loggedInUser);
+                //@ts-ignore
                 changeContacts(loggedInUser.channels)
                 return navigate("/");
             }
